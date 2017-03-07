@@ -30,7 +30,7 @@ OE_VERSION="10.0"
 # Set this to True if you want to install Odoo 10 Enterprise!
 IS_ENTERPRISE="False"
 #set the superadmin password
-OE_SUPERADMIN="admin"
+OE_SUPERADMIN="odoo"
 OE_CONFIG="${OE_USER}-server"
 
 ##
@@ -45,8 +45,10 @@ WKHTMLTOX_X32=http://download.gna.org/wkhtmltopdf/0.12/0.12.1/wkhtmltox-0.12.1_l
 # Update Server
 #--------------------------------------------------
 echo -e "\n---- Update Server ----"
+sudo apt-get install openssh-server
 sudo apt-get update
 sudo apt-get upgrade -y
+sudo apt-get dist-upgrade -y
 
 #--------------------------------------------------
 # Install PostgreSQL Server
@@ -64,7 +66,7 @@ echo -e "\n---- Install tool packages ----"
 sudo apt-get install wget git python-pip gdebi-core -y
 	
 echo -e "\n---- Install python packages ----"
-sudo apt-get install python-dateutil python-feedparser python-ldap python-libxslt1 python-lxml python-mako python-openid python-psycopg2 python-pybabel python-pychart python-pydot python-pyparsing python-reportlab python-simplejson python-tz python-vatnumber python-vobject python-webdav python-werkzeug python-xlwt python-yaml python-zsi python-docutils python-psutil python-mock python-unittest2 python-jinja2 python-pypdf python-decorator python-requests python-passlib python-pil -y python-suds
+sudo apt-get install python-dateutil python-feedparser python-ldap python-libxslt1 python-lxml python-mako python-openid python-psycopg2 python-pybabel python-pychart python-pydot python-pyparsing python-reportlab python-simplejson python-tz python-vatnumber python-vobject python-webdav python-werkzeug python-xlwt python-yaml python-zsi python-docutils python-psutil python-mock python-unittest2 python-jinja2 python-pypdf python-decorator python-requests python-passlib python-pil python-suds -y
 	
 echo -e "\n---- Install python libraries ----"
 sudo pip install gdata psycogreen ofxparse XlsxWriter
@@ -108,7 +110,8 @@ sudo chown $OE_USER:$OE_USER /var/log/$OE_USER
 echo -e "\n==== Installing ODOO Server ===="
 sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/odoo/odoo $OE_HOME_EXT/
 
-if [ $IS_ENTERPRISE = "True" ]; then
+#Let's download the enterprise code anyway
+#if [ $IS_ENTERPRISE = "True" ]; then
     # Odoo Enterprise install!
     echo -e "\n--- Create symlink for node"
     sudo ln -s /usr/bin/nodejs /usr/bin/node
@@ -119,14 +122,14 @@ if [ $IS_ENTERPRISE = "True" ]; then
     sudo git clone --depth 1 --branch 10.0 https://www.github.com/odoo/enterprise "$OE_HOME/enterprise/addons"
 
     echo -e "\n---- Installing Enterprise specific libraries ----"
-    sudo apt-get install nodejs npm
+    sudo apt-get install nodejs npm -y
     sudo npm install -g less
     sudo npm install -g less-plugin-clean-css
-else
+#else
     echo -e "\n---- Create custom module directory ----"
     sudo su $OE_USER -c "mkdir $OE_HOME/custom"
     sudo su $OE_USER -c "mkdir $OE_HOME/custom/addons"
-fi
+#fi
 
 echo -e "\n---- Setting permissions on home folder ----"
 sudo chown -R $OE_USER:$OE_USER $OE_HOME/*
